@@ -32,6 +32,14 @@ socket.on('clients-total', (data) => {
 
 })
 
+socket.on('history', (data) => {
+    data.forEach(element => {
+        if(socket.id === element.socketId) addMessageToUI(true, element)
+        else addMessageToUI(false, element)
+        
+    })
+})
+
 socket.on('chat-message', (data) => {
     console.log(data)
     addMessageToUI(false, data)
