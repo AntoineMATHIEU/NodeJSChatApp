@@ -16,7 +16,6 @@ messageForm.addEventListener('submit', (e) => {
 })
 
 function sendMessage() {
-    messageContainer.style.backgroundColor = '#a31212'
     if(messageInput.value === '') return
     const data = {
         name: nameInput.value,
@@ -24,8 +23,13 @@ function sendMessage() {
         dateTime: new Date()
     }
     socket.emit('message', data)
-    addMessageToUI(true, data)
-    messageInput.value = ''
+    if(!messageInput.value[0] === "<")
+    {
+        addMessageToUI(true, data)
+        
+    }
+    messageInput.value = ''  
+
 }
 
 socket.on('clients-total', (data) => {
@@ -50,12 +54,18 @@ socket.on('chat-message', (data) => {
     
 })
 
+socket.on('change-color', (data) => {
+
+    console.log(data)
+    messageContainer.style.backgroundColor = data;
+})
+
 function addMessageToUI(isOwnerMessage, data){
     clearFeedback()
     const element = `<li class="${isOwnerMessage ? "message-right" : "message-left"}">
     <p class="message">
         ${data.message}
-      <span>${data.name}${moment(data.dateTime).fromNow()}</span>
+      <span>${data.name} ${moment(data.dateTime).fromNow()}</span>
     </p>
   </li>`
 

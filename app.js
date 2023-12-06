@@ -11,6 +11,9 @@ const io = require('socket.io')(server)
 const log = require('./modules/logger')
 const calcul = require('./modules/calculatrice')
 
+const BackgroundColor = require('./modules/customisation')
+const backgroundColor = new BackgroundColor()
+
 
 
 app.use(express.static(path.join(__dirname,'public')))
@@ -37,13 +40,21 @@ function onConnection(socket) {
     })
  
     socket.on('message', (data) => {
+        
         //si le message commence par un =, on le calcule
         if(data.message[0] === "=")
         {
+
             data.message = calcul(data.message)
             //on envoie seulement le  message au client qui l'a envoyé
             io.to(socket.id).emit('chat-message', data);
             log('resultat calcul')            
+        }
+        else if(data.message[0] === "<")
+        {
+            log('changement de couleur')
+            io.to(socket.id).emit('change-color', backgroundColor.change_color(data.message));
+                   
         }
         else
         {
