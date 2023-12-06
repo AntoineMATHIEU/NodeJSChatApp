@@ -1,5 +1,7 @@
 const socket = io()
 
+
+
 const clientsTotal = document.getElementById('client-total')
 const messageForm = document.getElementById('message-form')
 const messageContainer = document.getElementById('message-container')
@@ -14,6 +16,7 @@ messageForm.addEventListener('submit', (e) => {
 })
 
 function sendMessage() {
+    messageContainer.style.backgroundColor = '#a31212'
     if(messageInput.value === '') return
     const data = {
         name: nameInput.value,

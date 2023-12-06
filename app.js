@@ -8,6 +8,10 @@ const historic = []
 
 const io = require('socket.io')(server)
 
+const log = require('./modules/logger')
+const calcul = require('./modules/calculatrice')
+
+
 
 app.use(express.static(path.join(__dirname,'public')))
 
@@ -16,12 +20,10 @@ let sockets = new Set()
 io.on('connection', onConnection)
 
 
-    
-    
-
-
 function onConnection(socket) {
-    console.log('new connection', socket.id)
+    //log connected + socket.id
+    log('connected', socket.id)
+
     sockets.add(socket.id)
 
     io.emit('clients-total', sockets.size)
@@ -29,16 +31,28 @@ function onConnection(socket) {
     socket.emit('history', historic);
 
     socket.on('disconnect', () => {
-        console.log('disconnected', socket.id)
+        log('disconnected', socket.id)
         sockets.delete(socket.id)
         io.emit('clients-total', sockets.size)
     })
  
     socket.on('message', (data) => {
-        socket.broadcast.emit('chat-message', data)
-        // add socket.id to data
-        data.socketId = socket.id
-        historic.push(data)
+        //si le message commence par un =, on le calcule
+        if(data.message[0] === "=")
+        {
+            data.message = calcul(data.message)
+            //on envoie seulement le  message au client qui l'a envoyé
+            io.to(socket.id).emit('chat-message', data);
+            log('resultat calcul')            
+        }
+        else
+        {
+            data.socketId = socket.id
+            historic.push(data)
+            socket.broadcast.emit('chat-message', data)
+            log('message')
+            
+        }       
     })
 
     socket.on('feedback', (data) => {
