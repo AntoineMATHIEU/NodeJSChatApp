@@ -23,10 +23,10 @@ function sendMessage() {
         dateTime: new Date()
     }
     socket.emit('message', data)
-    if(!messageInput.value[0] === "<")
+    // si le message ne commence pas par <, on l'affiche
+    if(data.message[0] !== "<")
     {
         addMessageToUI(true, data)
-        
     }
     messageInput.value = ''  
 
@@ -50,7 +50,6 @@ socket.on('history', (data) => {
 socket.on('chat-message', (data) => {
     console.log(data)
     addMessageToUI(false, data)
-    messageTone.play()
     
 })
 
